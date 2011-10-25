@@ -44,5 +44,5 @@
 
 (def-api-fn vendor-categories "vendors/categories" :optional-args [level])
 
-(def-api-fn promotions "promotions")
-(def-api-fn promotions-random "promotions/random" :optional-args [number])
+(def-api-fn special-offers "special-offers")
+(def-api-fn special-offers-random "special-offers/random" :optional-args [number])
