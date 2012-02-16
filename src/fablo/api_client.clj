@@ -12,12 +12,10 @@
 ;;; Our api-request is an http request wrapped in signature processing
 (def api-request (auth/wrap-sign-request #'http/request))
 
-;;; original
-
 (defmacro def-api-fn [name url-template & {:keys [request-method required-args optional-args url-template-args signature-required]}]
   (let [url-parameters (set url-template-args)
         uri (gensym "uri-")]
-    `(defn ~name [~@required-args & {:keys ~(vec (conj optional-args 'api-server 'api-customer 'api-auth-info))}]
+    `(defn ~name [~@required-args & {:keys ~(vec (conj optional-args 'api-server 'api-customer 'api-auth-info 'throw-exceptions))}]
        (let [~uri (string/join "/" ["/api/2" (or ~'api-customer ~'*api-customer*) (format ~url-template ~@url-template-args)])
              request-map# (merge
                            {:url (str "http://" (or ~'api-server ~'*api-server*) ~uri) ; TODO: extract "or"
@@ -26,7 +24,7 @@
                                                  ~@(map (fn [x] `(if ~x {~(str x) (if (string? ~x) ~x (json/generate-string ~x))} {}))
                                                         optional-args))
                             :headers {"host" (or ~'api-server ~'*api-server*)}
-                            :throw-exceptions false}
+                            :throw-exceptions (or ~'throw-exceptions false)}
                            ~(when signature-required
                               `(when-let [auth-info# (or ~'api-auth-info ~'*api-auth-info*)]
                                  {:amazon-aws-auth [(or (:key-id auth-info#) "default") (:key auth-info#)]
