@@ -31,7 +31,7 @@
                                   :uri ~uri})))]
          (select-keys (api-request request-map#) [:status :body])))))
 
-(def-api-fn products-query "products/query" :optional-args [search-string start results category prefilter attributes return])
+(def-api-fn products-query "products/query" :optional-args [search-string start results category prefilter attributes return sort weak-sort])
 (def-api-fn product "products/id/%s" :required-args [id] :optional-args [return] :url-template-args [id])
 (def-api-fn product-variants-query "products/id/%s/variants/query" :required-args [id] :optional-args [options return] :url-template-args [id])
 (def-api-fn product-categories "products/categories" :optional-args [level])
