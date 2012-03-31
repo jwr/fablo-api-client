@@ -1,6 +1,7 @@
 (ns fablo.auth
   (:require [clojure.string :as string]
-            [ring.util.codec :as codec])
+            [ring.util.codec :as codec]
+            [clj-http.client :as http])
   (:import [javax.crypto Mac]
            [javax.crypto.spec SecretKeySpec]))
 
@@ -63,18 +64,27 @@
      [false "Unsupported signature version, only version 2 is supported"]
 
      (not= signature (hmac method (string-to-sign req) key))
-     [false (pr-str "Signature verification failed, got " signature)]
+     [false (pr-str "Signature verification failed, got " signature " ; should be:" (hmac method (string-to-sign req) key))]
 
      true
      [true "Signature verification succesful"])))
 
-(defn wrap-sign-request [client]
+(defn wrap-sign-request
+  "Closure returning function, responsible for proper requests to Fablo."
+  [client]
   (fn [req]
     (if-let [[key-id key] (:amazon-aws-auth req)]
-      (let [headers (merge {"SignatureVersion" "2"
+      (let [params (merge {"SignatureVersion" "2"
                             "SignatureMethod" "HmacSHA256"
                             "AWSAccessKeyId" key-id}
-                           (:headers req))
-            signature (hmac-sha256 (string-to-sign (assoc req :headers headers)) key)]
-        (client (assoc (dissoc req :amazon-aws-auth) :headers (assoc headers "Signature" signature))))
+                           (:query-params req))
+            query-params (assoc params "Signature" (hmac-sha256 (string-to-sign (assoc req :params params)) key))
+            cleaned-req (dissoc req :amazon-aws-auth :uri)] ; :amazon-aws-auth :uri are only temporary keys, they should not be send!
+        (cond
+         (= (:method req) :post)
+         (client (assoc cleaned-req :body (http/generate-query-string query-params)
+                   :content-type "application/x-www-form-urlencoded"))
+
+         true                           ; default handling is get
+         (client (assoc cleaned-req :query-params query-params))))
       (client req))))
