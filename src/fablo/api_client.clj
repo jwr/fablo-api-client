@@ -54,6 +54,14 @@
 (def-api-fn config "admin/config" :signature-required true)
 
 ;;; POST functions
+(def-api-fn config-set "admin/config" :request-method :post, :signature-required true
+  :required-args [config])
 (def-api-fn switch-db "admin/switch-db" :request-method :post, :signature-required true)
 (def-api-fn upload-db "admin/upload-db" :request-method :post, :signature-required true
   :required-args [data-url] :optional-args [format check autoswitch])
+
+;;; DELETE functions
+(def-api-fn config-delete-key "admin/config/%s" :request-method :delete, :signature-required true
+  :required-args [config-key] :url-template-args [config-key]) ; not really sure how this should work
+(def-api-fn config-delete-subkey "admin/config/%s/%s" :request-method :delete, :signature-required true
+  :required-args [config-key config-subkey] :url-template-args [config-key config-subkey])
