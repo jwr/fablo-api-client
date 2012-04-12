@@ -47,18 +47,24 @@
 (def-api-fn special-offers "special-offers")
 (def-api-fn special-offers-random "special-offers/random" :optional-args [number])
 
+(def-api-fn version "admin/version")
+(def-api-fn status "admin/status")
+
 ;;; functions requiring authentication
 
 ;;; GET functions
 (def-api-fn indexing-status "admin/indexing-status" :signature-required true)
 (def-api-fn config "admin/config" :signature-required true)
+(def-api-fn features "admin/features" :signature-required true)
 
 ;;; POST functions
 (def-api-fn config-set "admin/config" :request-method :post, :signature-required true
   :required-args [config])
 (def-api-fn switch-db "admin/switch-db" :request-method :post, :signature-required true)
 (def-api-fn upload-db "admin/upload-db" :request-method :post, :signature-required true
-  :required-args [data-url] :optional-args [format check autoswitch])
+  :required-args [data-url] :optional-args [format autoswitch])
+(def-api-fn feedback "recommendations/feedback/%s" :request-method :post :signature-required true
+  :required-args [feedback-type user products] :optional-args [session-id] :url-template-args [feedback-type])
 
 ;;; DELETE functions
 (def-api-fn config-delete-key "admin/config/%s" :request-method :delete, :signature-required true
