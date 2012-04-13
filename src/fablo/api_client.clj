@@ -17,19 +17,22 @@
         uri (gensym "uri-")]
     `(defn ~name [~@required-args & {:keys ~(vec (conj optional-args 'api-server 'api-customer 'api-auth-info 'throw-exceptions))}]
        (let [~uri (string/join "/" ["/api/2" (or ~'api-customer ~'*api-customer*) (format ~url-template ~@url-template-args)])
+             api-server# (or ~'api-server ~'*api-server*)
              request-map# (merge
-                           {:url (str "http://" (or ~'api-server ~'*api-server*) ~uri) ; TODO: extract "or"
+                           {:url (str "http://" api-server# ~uri)
                             :method ~(or request-method :get)
                             :query-params (merge ~(into {} (map #(vector (str %) %) (remove url-parameters required-args)))
                                                  ~@(map (fn [x] `(if ~x {~(str x) (if (string? ~x) ~x (json/generate-string ~x))} {}))
                                                         optional-args))
-                            :headers {"host" (or ~'api-server ~'*api-server*)}
-                            :throw-exceptions (or ~'throw-exceptions false)}
+                            :headers {"host" api-server#}
+                            :throw-exceptions (or ~'throw-exceptions false)
+                            :throw-entire-message? true}
                            ~(when signature-required
                               `(when-let [auth-info# (or ~'api-auth-info ~'*api-auth-info*)]
                                  {:amazon-aws-auth [(or (:key-id auth-info#) "default") (:key auth-info#)]
                                   :uri ~uri})))]
-         (select-keys (api-request request-map#) [:status :body])))))
+         (select-keys (api-request request-map#)
+                      [:status :body])))))
 
 (def-api-fn products-query "products/query" :optional-args [search-string start results category prefilter attributes return sort weak-sort])
 (def-api-fn product "products/id/%s" :required-args [id] :optional-args [return] :url-template-args [id])
