@@ -79,12 +79,13 @@
                             "AWSAccessKeyId" key-id}
                            (:query-params req))
             query-params (assoc params "Signature" (hmac-sha256 (string-to-sign (assoc req :params params)) key))
-            cleaned-req (dissoc req :amazon-aws-auth :uri)] ; :amazon-aws-auth :uri are only temporary keys, they should not be send!
+            cleaned-req (dissoc req :amazon-aws-auth :uri :query-params)] ; :amazon-aws-auth :uri are only temporary keys,
+                                        ; query-params is reattached later if necessary
         (cond
          (= (:method req) :post)
          (client (assoc cleaned-req :body (http/generate-query-string query-params)
                    :content-type "application/x-www-form-urlencoded"))
 
-         true                           ; default handling is get
+         :else                           ; default handling is get
          (client (assoc cleaned-req :query-params query-params))))
       (client req))))
