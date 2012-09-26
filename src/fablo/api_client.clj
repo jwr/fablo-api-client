@@ -39,16 +39,17 @@
 (def-api-fn product-variants-query "products/id/%s/variants/query" :required-args [id] :optional-args [options return] :url-template-args [id])
 (def-api-fn product-categories "products/categories" :optional-args [level])
 
-(def-api-fn vendors "vendors")
-(def-api-fn vendors-auth "vendors" :signature-required true)
+(def-api-fn vendors-all "vendors/all")
 (def-api-fn vendors-query "vendors/query" :optional-args [category])
-
 (def-api-fn vendor-by-id "vendors/id/%s" :required-args [id] :url-template-args [id])
+(def-api-fn vendor-categories-all "vendors/categories/all" :optional-args [level])
 
-(def-api-fn vendor-categories "vendors/categories" :optional-args [level])
-
-(def-api-fn special-offers "special-offers")
+(def-api-fn special-offers-all "special-offers/all")
 (def-api-fn special-offers-random "special-offers/random" :optional-args [number])
+(def-api-fn special-offers-query "special-offers/query" :optional-args [category attributes sorting])
+
+(def-api-fn recommendations-product "recommendations/product/%s" :required-args [id] :url-template-args [id] :optional-args [what-to-return attributes])
+(def-api-fn recommendations-user "recommendations/user/%s" :required-args [id] :url-template-args [id] :optional-args [what-to-return attributes])
 
 (def-api-fn version "admin/version")
 (def-api-fn status "admin/status")
