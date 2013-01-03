@@ -64,7 +64,7 @@
      [false "Unsupported signature version, only version 2 is supported"]
 
      (not= signature (hmac method (string-to-sign req) key))
-     [false (pr-str "Signature verification failed, got " signature " ; should be:" (hmac method (string-to-sign req) key))]
+     [false (pr-str "Signature verification failed, got " signature)]
 
      true
      [true "Signature verification succesful"])))
