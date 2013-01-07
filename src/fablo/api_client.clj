@@ -69,6 +69,8 @@
   :required-args [data-url] :optional-args [format autoswitch])
 (def-api-fn feedback "recommendations/feedback/%s" :request-method :post :signature-required true
   :required-args [feedback-type user products] :optional-args [session-id] :url-template-args [feedback-type])
+(def-api-fn shopify-authorize-shop "admin/shopify/authorize-shop" :request-method :post, :signature-required true
+  :required-args [shop timestamp signature t])
 
 ;;; DELETE functions
 (def-api-fn config-delete-key "admin/config/%s" :request-method :delete, :signature-required true
